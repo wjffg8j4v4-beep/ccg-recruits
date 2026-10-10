@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>CCG Recruit Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700;1,800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one slanted licensing track across the top with a count at each step,
+   hairline rows beneath it, recruit detail slides in from the right.
+   Single dark look on purpose: the team brand is black with electric blue. */
+:root{
+  color-scheme:dark;
+  --bg:#06080c; --panel:#0b0f16; --raise:#121823; --line:#1b2331; --line-2:#2b3649;
+  --fg:#eaf0fa; --mut:#8e9aaf; --dim:#6f7b92;
+  --blue:#2468ff; --blue-hi:#6aa2ff; --blue-ink:#ffffff; --blue-soft:rgba(36,104,255,.16);
+  --ok:#2fd18a; --warn:#f5a524; --bad:#ff6b63;
+  --display:"Barlow Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--fg);font:400 16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,p,ol,ul,dl,dd{margin:0}
+ol,ul{padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--blue-hi);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:20px 72px;display:flex;flex-direction:column;gap:28px}
+
+/* demo strip */
+.demo{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:8px 20px;background:var(--raise);border-bottom:1px solid var(--line);font-size:14px}
+.demo-tag{font:800 italic 15px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--warn)}
+.demo-txt{color:var(--mut);flex:1 1 200px;min-width:0}
+.demo-btns{display:flex;flex-wrap:wrap;gap:4px 4px}
+.demo-btns button{background:none;border:1px solid transparent;color:var(--mut);padding:6px 10px;border-radius:2px;cursor:pointer}
+.demo-btns button:hover{color:var(--fg)}
+.demo-btns button[aria-pressed="true"]{color:var(--fg);border-color:var(--line-2);background:var(--bg)}
+
+/* type */
+.big{font:800 italic clamp(34px,6vw,56px)/.95 var(--display);letter-spacing:.01em;text-transform:uppercase;text-wrap:balance}
+.h2{font:800 italic 24px/1 var(--display);letter-spacing:.04em;text-transform:uppercase}
+.eyebrow{font:700 italic 15px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--blue-hi)}
+.lede{color:var(--mut);max-width:60ch}
+.fine{color:var(--mut);font-size:14px;max-width:62ch}
+.tag{font:700 italic 13px/1 var(--display);letter-spacing:.14em;text-transform:uppercase}
+
+/* wordmark + top bar */
+.mark{display:flex;align-items:baseline;gap:10px}
+.mark-a{font:800 italic 34px/.9 var(--display);letter-spacing:.02em;color:var(--blue-hi)}
+.mark-b{font:700 italic 16px/1 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--fg)}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:4px 22px;flex-wrap:wrap;flex:1 1 auto}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 0 7px;font:700 italic 18px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);cursor:pointer}
+.tabs button:hover{color:var(--fg)}
+.tabs button[aria-current="page"]{color:var(--fg);border-bottom-color:var(--blue)}
+.who{display:flex;align-items:center;gap:14px;color:var(--mut);font-size:14px;margin-left:auto}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 24px;border:1px solid var(--line-2);background:transparent;color:var(--fg);border-radius:2px;cursor:pointer;transform:skewX(-9deg);font:800 italic 18px/1 var(--display);letter-spacing:.08em;text-transform:uppercase}
+.btn>span{display:block;transform:skewX(9deg)}
+.btn:hover{border-color:var(--blue-hi)}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:var(--blue-ink)}
+.btn.pri:hover{background:#3a7bff;border-color:#3a7bff}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn.sm{min-height:38px;padding:0 16px;font-size:16px}
+.link{background:none;border:0;padding:10px 0;color:var(--blue-hi);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.link:hover{color:var(--fg)}
+.link.bad{color:var(--bad)}
+
+/* forms */
+.form{display:flex;flex-direction:column;gap:16px}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f label{font:700 italic 14px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.f input,.f select,.f textarea,.inp{width:100%;min-height:46px;padding:10px 12px;background:var(--panel);border:1px solid var(--line-2);border-radius:2px;color:var(--fg)}
+.f textarea{min-height:84px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus,.inp:focus{border-color:var(--blue-hi);outline:none;box-shadow:0 0 0 2px var(--blue-soft)}
+.f [aria-invalid="true"]{border-color:var(--bad)}
+.err{color:var(--bad);font-size:14px;min-height:0}
+.err:empty{display:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.alt{color:var(--mut);font-size:15px}
+
+/* auth screens */
+.auth{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:40px 64px;align-items:start;padding-block:36px 72px}
+.auth-l{display:flex;flex-direction:column;gap:22px;min-width:0}
+.preview{counter-reset:s;display:grid;gap:0;border-top:1px solid var(--line);max-width:460px}
+.preview li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.preview li::before{content:counter(s);font:800 italic 20px/1 var(--display);color:var(--blue-hi)}
+.auth-r{background:var(--panel);border:1px solid var(--line);padding:26px 24px 28px;min-width:0}
+
+/* track */
+.track{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:0;border-top:1px solid var(--line)}
+.stop{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;padding:14px 12px 14px 0;background:none;border:0;border-bottom:1px solid var(--line);border-top:3px solid var(--line-2);margin-top:-1px;cursor:pointer;min-width:0;transform-origin:left}
+.stop-n{font:800 italic 44px/.85 var(--display);font-variant-numeric:tabular-nums;color:var(--fg)}
+.stop-nm{font-size:13px;line-height:1.25;color:var(--mut)}
+.stop.zero .stop-n{color:var(--dim)}
+.stop:hover{border-top-color:var(--blue-hi)}
+.stop[aria-pressed="true"]{border-top-color:var(--blue);background:linear-gradient(var(--blue-soft),transparent)}
+.stop[aria-pressed="true"] .stop-n{color:var(--blue-hi)}
+.stop[aria-pressed="true"] .stop-nm{color:var(--fg)}
+
+/* tools row */
+.tools{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.tools .f{flex:1 1 220px}
+.tools .f.narrow{flex:0 1 250px}
+
+/* recruit rows */
+.cols,.row{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.6fr) 120px;gap:20px;align-items:center}
+.cols{padding:0 0 8px;color:var(--dim);border-bottom:1px solid var(--line)}
+.cols span:last-child{text-align:right}
+.row{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 0;cursor:pointer}
+.row:hover{background:var(--panel)}
+.r-who{display:flex;flex-direction:column;gap:2px;min-width:0}
+.r-name{font-weight:600;font-size:17px;overflow-wrap:anywhere}
+.r-sub{color:var(--mut);font-size:14px;overflow-wrap:anywhere}
+.r-prog{display:flex;flex-direction:column;gap:7px;min-width:0}
+.r-step{font-size:15px;display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}
+.r-count{color:var(--mut);font-size:14px;font-variant-numeric:tabular-nums}
+.r-wait{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:13px;color:var(--mut);text-align:right}
+.r-wait b{font:800 italic 30px/.9 var(--display);color:var(--fg);font-variant-numeric:tabular-nums}
+.r-wait.stalled b,.r-wait.stalled .tag{color:var(--warn)}
+.r-wait.done b{font-size:24px;color:var(--ok);letter-spacing:.06em;text-transform:uppercase}
+.segs{display:flex;gap:3px;padding-left:3px}
+.segs i{flex:1;height:8px;background:var(--line-2);transform:skewX(-24deg)}
+.segs i.on{background:var(--blue)}
+.segs.fin i.on{background:var(--ok)}
+.segs.lg i{height:14px}
+.empty{padding:28px 0;color:var(--mut);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+
+/* checklist */
+.chk{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.chk-b{position:relative;width:28px;height:28px;display:block}
+.chk-b input{position:absolute;inset:0;width:28px;height:28px;margin:0;opacity:0;cursor:pointer}
+.box{position:absolute;inset:1px;border:2px solid var(--line-2);transform:skewX(-10deg);display:grid;place-items:center}
+.chk-b input:checked + .box{background:var(--blue);border-color:var(--blue)}
+.chk-b input:checked + .box::after{content:"";width:11px;height:6px;border-left:3px solid var(--blue-ink);border-bottom:3px solid var(--blue-ink);transform:skewX(10deg) rotate(-45deg) translate(1px,-2px)}
+.chk-b input:focus-visible + .box{outline:2px solid var(--blue-hi);outline-offset:3px}
+.chk-b input:disabled + .box{opacity:.55}
+.chk-nm{min-width:0;overflow-wrap:anywhere}
+.chk-dt{color:var(--mut);font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chk.next .chk-nm{font-weight:600}
+.chk.next .chk-dt{color:var(--blue-hi)}
+.chk.locked{cursor:default}
+.checklist{border-top:1px solid var(--line)}
+.chk.has-how{border-bottom:0;padding-bottom:2px}
+.how{padding:0 0 12px 42px;border-bottom:1px solid var(--line)}
+.how summary{display:inline-flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;color:var(--blue-hi);font-size:14px;list-style:none}
+.how summary::-webkit-details-marker{display:none}
+.how summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);margin-right:2px}
+.how[open] summary::before{transform:rotate(45deg) translate(-2px,-2px)}
+.how summary:hover{color:var(--fg)}
+.how-b{display:flex;flex-direction:column;gap:8px;padding:4px 0 2px;max-width:56ch;min-width:0}
+.how-b p{color:var(--fg);font-size:15px}
+.links{display:flex;flex-direction:column;align-items:flex-start;gap:0;min-width:0}
+.links a{color:var(--blue-hi);padding:7px 0;text-underline-offset:3px;overflow-wrap:anywhere}
+.links a:hover{color:var(--fg)}
+.nolink{color:var(--mut);padding:7px 0}
+
+/* recruit's own page */
+.me{display:flex;flex-direction:column;gap:18px;max-width:640px}
+
+/* detail panel */
+.scrim{position:fixed;inset:0;background:rgba(3,5,8,.72);z-index:20}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(500px,100%);z-index:21;background:var(--panel);border-left:1px solid var(--line-2);overflow-y:auto;display:flex;flex-direction:column;gap:22px;padding:calc(14px + env(safe-area-inset-top,0px)) 22px calc(40px + env(safe-area-inset-bottom,0px))}
+.panel-top{display:flex;justify-content:flex-end}
+.p-meta{color:var(--mut)}
+.contact{display:grid;gap:0;border-top:1px solid var(--line)}
+.contact div{display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding:4px 0}
+.contact dt{color:var(--mut);font-size:14px}
+.contact dd{min-width:0;overflow-wrap:anywhere;user-select:all}
+.sec{display:flex;flex-direction:column;gap:12px}
+.sec-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec-h small{color:var(--mut);font-size:14px}
+.notes{display:flex;flex-direction:column;gap:14px}
+.notes li{border-left:2px solid var(--line-2);padding-left:12px}
+.notes .n-by{color:var(--mut);font-size:13px}
+.confirm{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:12px;border:1px solid var(--bad);color:var(--fg)}
+.confirm p{flex:1 1 200px;min-width:0}
+.acts{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;border-top:1px solid var(--line);padding-top:10px}
+
+/* steps editor */
+.sedit{border-top:1px solid var(--line);max-width:720px}
+.sedit>li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.sn{font:800 italic 22px/1 var(--display);color:var(--blue-hi);font-variant-numeric:tabular-nums}
+.sacts{display:flex;gap:0 14px;align-items:center}
+.sedit .note{grid-column:2 / -1;color:var(--mut);font-size:14px}
+.sedit .confirm{grid-column:1 / -1}
+.addstep{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;max-width:720px}
+.addstep .f{flex:1 1 240px}
+
+/* team */
+.team{border-top:1px solid var(--line);max-width:720px}
+.team li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 18px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.team .t-who{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}
+.team .t-who span{color:var(--mut);font-size:14px}
+.role{color:var(--blue-hi)}
+
+#flash{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:2px;font-weight:600;font-size:15px;max-width:calc(100% - 32px)}
+
+@media (max-width:760px){
+  .wrap{padding-inline:16px;gap:22px}
+  .demo{padding-inline:16px}
+  .auth{grid-template-columns:minmax(0,1fr);padding-block:20px 64px}
+  .auth-r{padding:22px 16px 24px}
+  .two{grid-template-columns:1fr}
+  .cols{display:none}
+  .row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"who wait" "prog prog";gap:10px 14px}
+  .r-who{grid-area:who}.r-prog{grid-area:prog}.r-wait{grid-area:wait}
+  .track{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stop-n{font-size:36px}
+  .who{margin-left:0;width:100%;justify-content:space-between}
+  .sedit>li{grid-template-columns:26px minmax(0,1fr)}
+  .sacts{grid-column:2}
+  .team li{grid-template-columns:minmax(0,1fr) auto}
+  .team li .link{grid-column:1 / -1;justify-self:start}
+}
+@media (prefers-reduced-motion:no-preference){
+  .panel.enter{animation:slide .18s ease-out}
+  @keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+}
+</style>
+
+</head>
+<body>
+<div id="demo"></div>
+<div id="app"></div>
+<div id="flash" role="status" aria-live="polite" hidden></div>
+
+<script src="supabase-2.45.4.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* Filled in by the live build. Left empty, the page runs as a demo on sample data. */
+const CONFIG = {"url":"https://tcfekdogoyuuoxmjuvoj.supabase.co","key":"sb_publishable__XgAgbvAb04_4ezsOpYmvA_-FLt0Mi6"};
+const LIVE = !!(CONFIG.url && CONFIG.key);
+
+/* ------------------------------------------------------------------
+   DATA LAYER (demo). Every read and write goes through `api`.
+   In the live build these same functions call the real database,
+   and the "who may see what" checks move into database rules.
+------------------------------------------------------------------- */
+const DAY = 864e5, STALL_DAYS = 14;
+const STATES = 'AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY'.split(' ');
+const STATE_NAMES = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado","CT":"Connecticut","DE":"Delaware","DC":"District of Columbia","FL":"Florida","GA":"Georgia","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming"};
+// Copied from the team's "Licensing links" sheet. null = the sheet says NONE.
+const STATE_LINKS = {"AL":{"course":"https://www.xcelsolutions.com/alabama/insurance-license/life","exam":"https://nipr.com/licensing-center/state-requirements/alabama-resident-licensing-individual","prints":"https://fieldprintalabama.com/individuals","doi":"https://www.aldoi.gov/"},
+  "AK":{"course":"https://www.xcelsolutions.com/alaska/insurance-license/life","exam":"https://home.pearsonvue.com/ak/insurance","prints":"https://dps.alaska.gov/statewide/r-i/background/fingerprinters","doi":"https://www.commerce.alaska.gov/web/ins/"},
+  "AZ":{"course":"https://www.xcelsolutions.com/arizona/insurance-license/life","exam":"https://www.prometric.com/arizona/insurance","prints":"https://difi.az.gov/finger-print","doi":"https://insurance.az.gov/"},
+  "AR":{"course":"https://www.xcelsolutions.com/arkansas/insurance-license/life","exam":"https://candidate.psiexams.com/catalog/test_catalog_details.jsp?catalogid=457&catalog_name=Arkansas","prints":"https://arkansaslivescan.com/","doi":"https://insurance.arkansas.gov/"},
+  "CA":{"course":"https://www.xcelsolutions.com/california/insurance-license/life","exam":"https://candidate.psiexams.com/catalog/fap_test_details.jsp?testid=2559&prev_page=/catalog/fap_test_catalog_details.jsp","prints":"https://accuratebiometrics.com/california/services/california-department-of-insurance","doi":"http://www.insurance.ca.gov/"},
+  "CO":{"course":"https://www.xcelsolutions.com/colorado/insurance-license/life","exam":"https://home.pearsonvue.com/co/insurance","prints":"https://doi.colorado.gov/colorado-and-national-fingerprint-based-criminal-history-background-check","doi":"https://www.colorado.gov/pacific/dora/division-insurance"},
+  "CT":{"course":"https://www.xcelsolutions.com/connecticut/insurance-license/life","exam":"https://home.pearsonvue.com/Clients/Connecticut-Insurance.aspx","prints":null,"doi":"https://portal.ct.gov/cid"},
+  "DE":{"course":"https://www.xcelsolutions.com/delaware/insurance-license/life","exam":"https://home.pearsonvue.com/de/insurance","prints":"https://uenroll.identogo.com/","doi":"https://insurance.delaware.gov/"},
+  "FL":{"course":"https://www.xcelsolutions.com/florida/insurance-license/life","exam":"https://home.pearsonvue.com/fl/insurance","prints":"https://fl.state.identogo.com/?RESTART&DFSORI=DFS-1-FL921060Z","doi":"https://myfloridacfo.com/"},
+  "GA":{"course":"https://www.xcelsolutions.com/georgia/insurance-license/life","exam":"https://home.pearsonvue.com/ga/insurance","prints":"https://oci.georgia.gov/document/document/background-check-fingerprinting-procedure/download","doi":"https://www.oci.ga.gov/"},
+  "HI":{"course":"https://www.xcelsolutions.com/hawaii/insurance-license/life","exam":"https://home.pearsonvue.com/hi/insurance","prints":"https://fieldprinthawaii.com/individuals","doi":"http://cca.hawaii.gov/ins/"},
+  "ID":{"course":"https://www.xcelsolutions.com/idaho/insurance-license/life","exam":"https://candidate.psiexams.com/catalog/fti_agency_license_details.jsp?fromwhere=findtest&testid=3808","prints":"https://home.pearsonvue.com/getattachment/ac328d49-b2e8-4382-88ae-75c330fe0c56/Idaho%20Insurance%20Fingerprint%20Hard%20Card%20Process.aspx","doi":"https://doi.idaho.gov/"},
+  "IL":{"course":"https://www.xcelsolutions.com/illinois/insurance-license/life","exam":"https://home.pearsonvue.com/il/insurance","prints":null,"doi":"https://insurance.illinois.gov/"},
+  "IN":{"course":"https://www.xcelsolutions.com/indiana/insurance-license/life","exam":"https://home.pearsonvue.com/in/insurance","prints":null,"doi":"https://www.in.gov/idoi/"},
+  "IA":{"course":"https://www.xcelsolutions.com/iowa/insurance-license/life","exam":"https://home.pearsonvue.com/ia/insurance","prints":null,"doi":"https://iid.iowa.gov/"},
+  "KS":{"course":"https://www.xcelsolutions.com/kansas/insurance-license/life","exam":"https://home.pearsonvue.com/ks/insurance","prints":"https://insurance.ks.gov/documents/agentagency/Instructions-for-requesting-criminal-background-check.pdf","doi":"https://insurance.kansas.gov/"},
+  "KY":{"course":"https://www.xcelsolutions.com/kentucky/insurance-license/life","exam":"https://insurance.ky.gov/ppc/new_default.aspx","prints":"https://kcoj.kycourts.net/PublicMenu/Default.aspx?header=AOC+FastCheck","doi":"http://insurance.ky.gov/ppc/default.aspx/"},
+  "LA":{"course":"https://www.xcelsolutions.com/louisiana/insurance-license/life","exam":"https://candidate.psiexams.com/catalog/test_catalog_details.jsp?catalogid=1&catalog_name=Louisiana","prints":"https://uenroll.identogo.com/","doi":"http://www.ldi.state.la.us/"},
+  "ME":{"course":"https://www.xcelsolutions.com/maine/insurance-license/life","exam":"https://home.pearsonvue.com/me/insurance","prints":null,"doi":"https://www.maine.gov/pfr/insurance/"},
+  "MD":{"course":"https://www.xcelsolutions.com/maryland/insurance-license/life","exam":"https://www.prometric.com/maryland/insurance","prints":null,"doi":"https://insurance.maryland.gov/Pages/default.aspx"},
+  "MA":{"course":"https://www.xcelsolutions.com/massachusetts/insurance-license/life","exam":"https://www.prometric.com/massachusetts/insurance","prints":null,"doi":"https://www.mass.gov/orgs/division-of-insurance"},
+  "MI":{"course":"https://www.xcelsolutions.com/michigan/insurance-license/life","exam":"https://candidate.psiexams.com/catalog/test_catalog_details.jsp?catalogid=119&catalog_name=Michigan","prints":null,"doi":"https://www.michigan.gov/difs/"},
+  "MN":{"course":"https://www.xcelsolutions.com/minnesota/insurance-license/life","exam":"https://home.pearsonvue.com/ms/insurance","prints":"https://proctor2.psionline.com/media/programs/MN%20INS%20Fingerprint%20hours.pdf","doi":"https://mn.gov/commerce/industries/insurance/"},
+  "MS":{"course":"https://www.xcelsolutions.com/mississippi/insurance-license/life","exam":"https://home.pearsonvue.com/ms/insurance","prints":null,"doi":"http://www.mid.ms.gov/"},
+  "MO":{"course":"https://www.xcelsolutions.com/missouri/insurance-license/life","exam":"https://home.pearsonvue.com/mo/insurance","prints":null,"doi":"https://insurance.mo.gov/"},
+  "MT":{"course":"https://www.xcelsolutions.com/montana/insurance-license/life","exam":"https://home.pearsonvue.com/mt/insurance","prints":"https://csimt.gov/wp-content/uploads/2023/10/Fingerprints-for-Insurance-Licensing-Purposes.pdf","doi":"https://csimt.gov/"},
+  "NE":{"course":"https://www.xcelsolutions.com/nebraska/insurance-license/life","exam":"https://test-takers.psiexams.com/neins","prints":null,"doi":"https://doi.nebraska.gov/"},
+  "NV":{"course":"https://www.xcelsolutions.com/nevada/insurance-license/life","exam":"https://home.pearsonvue.com/nv/insurance","prints":"https://uenroll.identogo.com/","doi":"http://doi.nv.gov/"},
+  "NH":{"course":"https://www.xcelsolutions.com/new-hampshire/insurance-license/life","exam":"https://www.prometric.com/newhampshire/insurance","prints":null,"doi":"https://www.nh.gov/insurance"},
+  "NJ":{"course":"https://www.xcelsolutions.com/new-jersey/insurance-license/life","exam":"https://home.psiexams.com/#/home?bc=njin","prints":"https://uenroll.identogo.com/workflows/2F16Y3","doi":"https://www.state.nj.us/dobi/index.html"},
+  "NM":{"course":"https://www.xcelsolutions.com/new-mexico/insurance-license/life","exam":"https://www.prometric.com/test-takers/search/insurance/newmexico","prints":"https://nm.state.identogo.com/","doi":"https://pd.osi.state.nm.us/#/providers/advanced"},
+  "NY":{"course":"https://www.xcelsolutions.com/new-york/insurance-license/life","exam":"https://home.psiexams.com/#/scheduling/search-test","prints":null,"doi":"https://www.dfs.ny.gov/"},
+  "NC":{"course":"https://www.xcelsolutions.com/north-carolina/insurance-license/life","exam":"https://home.pearsonvue.com/Clients/North-carolina-insurance.aspx","prints":"https://nipr.com/licensing-center/state-requirements/north-carolina-resident-licensing-individual","doi":"https://www.ncdoi.gov/"},
+  "ND":{"course":"https://www.xcelsolutions.com/north-dakota/insurance-license/life","exam":"https://test-takers.psiexams.com/ndins","prints":"https://proctor2.psionline.com/media/programs/ndfp1.pdf","doi":"https://www.nd.gov/ndins/"},
+  "OH":{"course":"https://www.xcelsolutions.com/ohio/insurance-license/life","exam":"https://home.psiexams.com/#/home?bc=ohin","prints":"https://www.ohioattorneygeneral.gov/Business/Services-for-Business/WebCheck/Webcheck-Community-Listing","doi":"https://insurance.ohio.gov/wps/portal/gov/odi"},
+  "OK":{"course":"https://www.xcelsolutions.com/oklahoma/insurance-license/life","exam":"https://www.prometric.com/user/login?destination=/oklahoma/insurance","prints":null,"doi":"https://www.oid.ok.gov/"},
+  "OR":{"course":"https://www.xcelsolutions.com/oregon/insurance-license/life","exam":"https://candidate.psiexams.com/catalog/displayagencylicenses.jsp?catalogID=337","prints":"https://proctor2.psionline.com/programs/Fingerprint%20hours.pdf","doi":"https://dfr.oregon.gov/Pages/index.aspx"},
+  "PA":{"course":"https://www.xcelsolutions.com/pennsylvania/insurance-license/life","exam":"https://candidate.psiexams.com/catalog/displayagencylicenses.jsp?catalogID=337","prints":"https://uenroll.identogo.com/","doi":"https://www.insurance.pa.gov/Pages/default.aspx"},
+  "RI":{"course":"https://www.xcelsolutions.com/rhode-island/insurance-license/life","exam":"https://home.pearsonvue.com/ri/insurance","prints":"https://riag.ri.gov/about-our-office/divisions-and-units/bureau-criminal-identification-bci","doi":"https://dbr.ri.gov/divisions/insurance/"},
+  "SC":{"course":"https://www.xcelsolutions.com/south-carolina/insurance-license/life","exam":"https://home.pearsonvue.com/sc/insurance","prints":"https://www.identogo.com/locations/south-carolina","doi":"https://doi.sc.gov/"},
+  "SD":{"course":"https://www.xcelsolutions.com/south-dakota/insurance-license/life","exam":"https://home.pearsonvue.com/sd/insurance","prints":null,"doi":"https://dlr.sd.gov/insurance/default.aspx"},
+  "TN":{"course":"https://www.xcelsolutions.com/tennessee/insurance-license/life","exam":"https://home.pearsonvue.com/tn/insurance","prints":"https://tn.state.identogo.com/","doi":"https://www.tn.gov/commerce.html"},
+  "TX":{"course":"https://www.xcelsolutions.com/texas/insurance-license/life","exam":"https://home.pearsonvue.com/tx/insurance","prints":"https://uenroll.identogo.com/workflows/11G6QF","doi":"https://www.tdi.texas.gov/"},
+  "UT":{"course":"https://www.xcelsolutions.com/utah/insurance-license/life","exam":"https://www.prometric.com/utah/insurance","prints":"https://insurance.utah.gov/licensee/producers/exam/fingerprinting","doi":"https://insurance.utah.gov/"},
+  "VT":{"course":"https://www.xcelsolutions.com/vermont/insurance-license/life","exam":"https://www.prometric.com/vermont/insurance","prints":null,"doi":"https://dfr.vermont.gov/"},
+  "VA":{"course":"https://www.xcelsolutions.com/virginia/insurance-license/life","exam":"https://www.prometric.com/virginia/insurance","prints":"https://fieldprintvirginia.com/individuals","doi":"http://www.scc.virginia.gov/boi/index.aspx"},
+  "WA":{"course":"https://www.xcelsolutions.com/washington/insurance-license/life","exam":"https://home.psiexams.com/#/scheduling/search-test","prints":"https://www.identogo.com/locations/washington","doi":"https://www.insurance.wa.gov/"},
+  "WV":{"course":"https://www.xcelsolutions.com/west-virginia/insurance-license/life","exam":"https://home.pearsonvue.com/wv/insurance","prints":"https://www.identogo.com/locations/west-virginia","doi":"https://www.wvinsurance.gov/"},
+  "WI":{"course":"https://www.xcelsolutions.com/wisconsin/insurance-license/life","exam":"https://home.psiexams.com/#/scheduling/search-test","prints":"https://fieldprintwisconsin.com/individuals","doi":"https://oci.wi.gov/Pages/Homepage.aspx"},
+  "WY":{"course":"https://www.xcelsolutions.com/wyoming/insurance-license/life","exam":"https://home.pearsonvue.com/wy/insurance","prints":"https://doi.wyo.gov/licensing/producers","doi":"http://doi.wyo.gov/"}};
+const REFERRERS = ['Jack/Hunter', 'Lucca', 'Kieran', 'Aiden'];
+const DEFAULT_STEPS = [
+  {id:'applied',      name:'Applied', auto:true},
+  {id:'course_start', name:'Pre-licensing course started'},
+  {id:'course_done',  name:'Course finished'},
+  {id:'exam_sched',   name:'State exam scheduled'},
+  {id:'exam_pass',    name:'Exam passed'},
+  {id:'prints',       name:'Fingerprints done'},
+  {id:'lic_app',      name:'License application submitted'},
+  {id:'lic_issued',   name:'License issued'},
+  {id:'contracts',    name:'Submitted contracts'}
+];
+const ago = n => new Date(Date.now() - n*DAY).toISOString();
+let db, session;
+
+function seed(){
+  const steps = DEFAULT_STEPS.map(s => ({...s}));
+  const users = [{id:'u-owner', name:'Sample Owner', email:'owner@example.com', password:'demo1234', role:'owner'}];
+  const recruits = [];
+  // name, state, phone, referred by, days-ago each step was finished (in order), role
+  const rows = [
+    ['Dana Whitlock',    'CA','(760) 555-0142','Jack/Hunter', [41,38,24,20,6]],
+    ['Marcus Oyelaran',  'TX','(512) 555-0117','Kieran',      [3]],
+    ['Priya Raman',      'FL','(305) 555-0163','Lucca',       [58,55,40,36,30,27,19]],
+    ['Tobias Lindqvist', 'AZ','(480) 555-0108','Jack/Hunter', [12,10]],
+    ['Renee Castellano', 'CA','(619) 555-0191','Lucca',       [70,66,50,45,40,38,30,12,2]],
+    ['Jalen Brooks',     'GA','(404) 555-0125','Kieran',      [25,22,4]],
+    ['Sofia Marchetti',  'NV','(702) 555-0136','Jack/Hunter', [33,31,17]],
+    ['Owen Takahashi',   'WA','(206) 555-0179','Aiden',       [9]],
+    ['Carmen Delgado',   'TX','(210) 555-0154','Lucca',       [47,44,30,26]],
+    ['Isaac Feldman',    'NY','(718) 555-0102','Jack/Hunter', [62,60,45,41,33,30,22,5]],
+    ['Hannah Okafor',    'CA','(858) 555-0148','Kieran',      [1]],
+    ['Luis Pereira',     'FL','(407) 555-0186','Aiden',       [20,18,9,7,6,3]],
+    ['Grant Holloway',   'CA','(760) 555-0170','Jack/Hunter', [120,116,100,96,90,88,80,70,64],'manager']
+  ];
+  rows.forEach((row, i) => {
+    const [name, state, phone, ref, d, role] = row;
+    const id = 'r' + (i+1);
+    const email = name.split(' ')[0].toLowerCase() + '@example.com';
+    users.push({id:'u-'+id, name, email, password:'demo1234', role: role || 'recruit'});
+    const done = {};
+    d.forEach((n, k) => { done[steps[k].id] = ago(n); });
+    recruits.push({id, userId:'u-'+id, name, state, phone, email, referredBy:ref, appliedAt:ago(d[0]), done, notes:[]});
+  });
+  recruits[2].notes.push({by:'Sample Owner', at:ago(5), text:'State says the application is in review. Check back Friday.'});
+  recruits[8].notes.push({by:'Grant Holloway', at:ago(11), text:'Exam got moved. New date not booked yet.'});
+  db = {steps, users, recruits, seq:100};
+  session = null;
+}
+
+function checkApply(f){
+  const e = {};
+  const name = String(f.name||'').trim().replace(/\s+/g,' ');
+  let digits = String(f.phone||'').replace(/\D/g,'');
+  if (digits.length === 11 && digits[0] === '1') digits = digits.slice(1);
+  const email = String(f.email||'').trim().toLowerCase();
+  const pw = String(f.password||'');
+  if (name.length < 2 || name.length > 80) e.name = 'Enter your full name.';
+  if (digits.length !== 10) e.phone = 'Enter a 10-digit phone number.';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address.';
+  if (!STATES.includes(f.state)) e.state = 'Pick your state.';
+  if (!REFERRERS.includes(f.referredBy)) e.referredBy = 'Pick who referred you.';
+  if (pw.length < 8) e.password = 'Use at least 8 characters.';
+  return {e, name, digits, email, pw, state:f.state, referredBy:f.referredBy};
+}
+function fieldError(e){ const err = new Error('Check the form.'); err.fields = e; return err; }
+
+const me = () => db.users.find(u => u.id === session) || null;
+const userOf = r => db.users.find(u => u.id === r.userId);
+function need(...roles){
+  const u = me();
+  if (!u || !roles.includes(u.role)) throw new Error('Not allowed.');
+  return u;
+}
+const MGR = ['owner','manager'];
+
+const api = {
+  me,
+  steps(){ return db.steps; },
+  signIn(email, pw){
+    const u = db.users.find(x => x.email === String(email).trim().toLowerCase());
+    if (!u || u.password !== pw) throw new Error('Email or password is wrong.');
+    session = u.id; return u;
+  },
+  signOut(){ session = null; },
+  apply(f){
+    const c = checkApply(f), e = c.e;
+    if (!e.email && db.users.some(u => u.email === c.email)) e.email = 'That email already has a login. Sign in instead.';
+    if (Object.keys(e).length) throw fieldError(e);
+    const name = c.name, digits = c.digits, email = c.email, pw = c.pw;
+    const n = ++db.seq, now = new Date().toISOString();
+    const user = {id:'u-n'+n, name, email, password:pw, role:'recruit'};
+    db.users.push(user);
+    db.recruits.push({id:'n'+n, userId:user.id, name, state:f.state,
+      phone:'('+digits.slice(0,3)+') '+digits.slice(3,6)+'-'+digits.slice(6),
+      email, referredBy:f.referredBy, appliedAt:now,
+      done:{[db.steps[0].id]:now}, notes:[]});
+    session = user.id;
+    return user;
+  },
+  myRecruit(){
+    const u = need('recruit');
+    return db.recruits.find(r => r.userId === u.id) || null;
+  },
+  listRecruits(){
+    need(...MGR);
+    return db.recruits.filter(r => userOf(r).role === 'recruit');
+  },
+  getRecruit(id){
+    const u = me(); if (!u) throw new Error('Not allowed.');
+    const r = db.recruits.find(x => x.id === id);
+    if (!r) throw new Error('That recruit no longer exists.');
+    if (u.role === 'recruit' && r.userId !== u.id) throw new Error('Not allowed.');
+    return r;
+  },
+  setStep(rid, sid, on){
+    const r = api.getRecruit(rid);
+    const s = db.steps.find(x => x.id === sid);
+    if (!s) throw new Error('That step no longer exists.');
+    if (s.auto) throw new Error('That step is ticked automatically.');
+    if (on) r.done[sid] = new Date().toISOString(); else delete r.done[sid];
+  },
+  addNote(rid, text){
+    const u = need(...MGR), r = api.getRecruit(rid);
+    const t = String(text||'').trim();
+    if (!t) throw new Error('Write the note first.');
+    r.notes.unshift({by:u.name, at:new Date().toISOString(), text:t});
+  },
+  removeRecruit(rid){
+    need(...MGR);
+    const r = api.getRecruit(rid);
+    db.recruits = db.recruits.filter(x => x.id !== rid);
+    db.users = db.users.filter(x => x.id !== r.userId);
+  },
+  addStep(name){
+    need(...MGR);
+    const t = String(name||'').trim();
+    if (!t) throw new Error('Type a name for the step.');
+    db.steps.push({id:'s'+(++db.seq), name:t});
+  },
+  renameStep(id, name){
+    need(...MGR);
+    const t = String(name||'').trim(), s = db.steps.find(x => x.id === id);
+    if (!s) return;
+    if (!t) throw new Error('A step needs a name.');
+    s.name = t;
+  },
+  moveStep(id, dir){
+    need(...MGR);
+    const i = db.steps.findIndex(x => x.id === id), j = i + dir;
+    if (i < 1 || j < 1 || j >= db.steps.length) return;
+    const [s] = db.steps.splice(i, 1); db.steps.splice(j, 0, s);
+  },
+  removeStep(id){
+    need(...MGR);
+    const s = db.steps.find(x => x.id === id);
+    if (!s || s.auto) throw new Error('That step cannot be removed.');
+    db.steps = db.steps.filter(x => x.id !== id);
+    db.recruits.forEach(r => { delete r.done[id]; });
+  },
+  listManagers(){
+    need(...MGR);
+    return db.users.filter(u => MGR.includes(u.role));
+  },
+  setRole(userId, role){
+    need('owner');
+    const u = db.users.find(x => x.id === userId);
+    if (!u || u.role === 'owner' || !['manager','recruit'].includes(role)) throw new Error('Not allowed.');
+    u.role = role;
+  }
+};
+
+/* ------------------------------------------------------------------ backends
+   The screens only ever read from D (a snapshot) and call B (the backend).
+   Demo: B wraps the sample data above.  Live: B talks to the real database,
+   where the same "who may do what" rules are enforced again by the database. */
+const D = {ready:false, error:'', me:null, steps:[], recruits:[], mine:null, managers:[]};
+const clone = x => JSON.parse(JSON.stringify(x));
+
+const demoBackend = {
+  async load(){
+    const u = api.me();
+    const d = {me:u ? {id:u.id, name:u.name, email:u.email, role:u.role} : null, steps:clone(api.steps()), recruits:[], mine:null, managers:[]};
+    if (u && u.role === 'recruit') d.mine = clone(api.myRecruit());
+    else if (u){ d.recruits = clone(api.listRecruits()); d.managers = api.listManagers().map(m => ({id:m.id, name:m.name, email:m.email, role:m.role})); }
+    return d;
+  },
+  async signIn(e, p){ api.signIn(e, p); },
+  async signOut(){ api.signOut(); },
+  async apply(f){ return {name:api.apply(f).name}; },
+  async setStep(r, sid, on){ api.setStep(r, sid, on); },
+  async addNote(r, t){ api.addNote(r, t); },
+  async removeRecruit(r){ api.removeRecruit(r); },
+  async addStep(n){ api.addStep(n); },
+  async renameStep(i, n){ api.renameStep(i, n); },
+  async moveStep(i, dir){ api.moveStep(i, dir); },
+  async removeStep(i){ api.removeStep(i); },
+  async setRole(uid, role){ api.setRole(uid, role); }
+};
+
+function liveBackend(){
+  const sb = window.supabase.createClient(CONFIG.url, CONFIG.key);
+  const nice = e => new Error(!e ? 'Something went wrong.'
+    : (e.code === '42501' || /row-level security|permission denied|not allowed/i.test(e.message || '')) ? 'Not allowed.'
+    : /failed to fetch|networkerror|load failed/i.test(e.message || '') ? 'No connection. Check your internet and try again.'
+    : (e.message || 'Something went wrong.'));
+  const q = async p => { const {data, error} = await p; if (error) throw nice(error); return data; };
+  const text = (v, msg) => { const t = String(v || '').trim(); if (!t) throw new Error(msg); return t; };
+  async function all(table, cols, order){          // the API hands back 1000 rows at a time
+    const out = [];
+    for (let from = 0; ; from += 1000){
+      let b = sb.from(table).select(cols);
+      order.forEach(o => { b = b.order(o[0], {ascending:o[1] !== false}); });
+      const rows = await q(b.range(from, from + 999));
+      out.push(...rows);
+      if (rows.length < 1000) return out;
+    }
+  }
+  return {
+    async load(){
+      const d = {me:null, steps:[], recruits:[], mine:null, managers:[]};
+      const {data:{session}} = await sb.auth.getSession();
+      d.steps = (await q(sb.from('steps').select('id,name,position,auto').order('position'))).map(s => ({id:s.id, name:s.name, auto:s.auto}));
+      if (!session) return d;
+      const uid = session.user.id;
+      const profs = await all('profiles', 'id,role,name,email', [['name'], ['id']]);
+      const mine = profs.find(p => p.id === uid);
+      if (!mine){ await sb.auth.signOut(); return d; }             // this login was removed
+      d.me = {id:uid, name:mine.name, email:mine.email, role:mine.role};
+      const mgr = mine.role !== 'recruit';
+      const [recs, ticks, notes] = await Promise.all([
+        all('recruits', 'id,user_id,name,state,phone,email,referred_by,applied_at', [['applied_at'], ['id']]),
+        all('progress', 'recruit_id,step_id,done_at', [['recruit_id'], ['step_id']]),
+        mgr ? all('notes', 'id,recruit_id,author_name,body,created_at', [['created_at', false], ['id']]) : []
+      ]);
+      const byId = {};
+      const shaped = recs.map(r => (byId[r.id] = {id:r.id, userId:r.user_id, name:r.name, state:r.state, phone:r.phone, email:r.email,
+        referredBy:r.referred_by, appliedAt:r.applied_at, done:{}, notes:[]}));
+      ticks.forEach(t => { if (byId[t.recruit_id]) byId[t.recruit_id].done[t.step_id] = t.done_at; });
+      notes.forEach(n => { if (byId[n.recruit_id]) byId[n.recruit_id].notes.push({by:n.author_name, at:n.created_at, text:n.body}); });
+      if (!mgr){ d.mine = shaped.find(r => r.userId === uid) || null; return d; }
+      const role = {}; profs.forEach(p => { role[p.id] = p.role; });
+      d.recruits = shaped.filter(r => role[r.userId] === 'recruit');
+      d.managers = profs.filter(p => p.role !== 'recruit').sort((a, b) => (b.role === 'owner') - (a.role === 'owner') || a.name.localeCompare(b.name))
+        .map(p => ({id:p.id, name:p.name, email:p.email, role:p.role}));
+      return d;
+    },
+    async signIn(email, pw){
+      const {error} = await sb.auth.signInWithPassword({email:String(email).trim(), password:pw});
+      if (error) throw (/invalid/i.test((error.code || '') + ' ' + (error.message || '')) ? new Error('Email or password is wrong.') : nice(error));
+    },
+    async signOut(){ await sb.auth.signOut(); },
+    async apply(f){
+      const c = checkApply(f);
+      if (Object.keys(c.e).length) throw fieldError(c.e);
+      const {data, error} = await sb.auth.signUp({email:c.email, password:c.pw,
+        options:{data:{name:c.name, phone:c.digits, state:c.state, referred_by:c.referredBy}}});
+      if (error){
+        const m = (error.code || '') + ' ' + (error.message || '');
+        if (/already|exists/i.test(m)) throw fieldError({email:'That email already has a login. Sign in instead.'});
+        if (/password/i.test(m)) throw fieldError({password:error.message});
+        if (/rate|too many/i.test(m)) throw new Error('Too many sign-ups right now. Wait a minute and try again.');
+        if (/database error/i.test(m)) throw new Error('The form was refused. Check each field and try again.');
+        throw nice(error);
+      }
+      if (!data.session) throw new Error('Your login was made but is waiting on a confirmation step. Tell your manager.');
+      return {name:c.name};
+    },
+    async setStep(rid, sid, on){
+      if (!on) return void await q(sb.from('progress').delete().eq('recruit_id', rid).eq('step_id', sid));
+      const {error} = await sb.from('progress').insert({recruit_id:rid, step_id:sid});
+      if (error && error.code !== '23505') throw nice(error);          // 23505 = already ticked
+    },
+    async addNote(rid, t){ await q(sb.from('notes').insert({recruit_id:rid, body:text(t, 'Write the note first.')})); },
+    async removeRecruit(rid){ await q(sb.rpc('remove_recruit', {rid})); },
+    async addStep(n){ await q(sb.from('steps').insert({name:text(n, 'Type a name for the step.')})); },
+    async renameStep(id, n){ await q(sb.from('steps').update({name:text(n, 'A step needs a name.')}).eq('id', id)); },
+    async moveStep(id, dir){ await q(sb.rpc('move_step', {sid:id, dir})); },
+    async removeStep(id){ await q(sb.from('steps').delete().eq('id', id)); },
+    async setRole(uid, role){ await q(sb.rpc('set_role', {target:uid, new_role:role})); }
+  };
+}
+// A live page that failed to load its database client must stop, never fall back to sample data.
+const B = !LIVE ? demoBackend : window.supabase ? liveBackend() : {load: async () => { throw new Error('The page did not load fully.'); }};
+async function sync(){ Object.assign(D, await B.load(), {ready:true, error:''}); }
+
+/* ------------------------------------------------------------------ helpers */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = iso => new Date(iso).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+const daysSince = iso => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / DAY));
+const dayWord = n => n === 0 ? 'today' : n === 1 ? '1 day ago' : n + ' days ago';
+
+function prog(r){
+  const steps = D.steps;
+  const idx = steps.map((s, i) => r.done[s.id] ? i : -1).filter(i => i >= 0);
+  const dates = idx.map(i => r.done[steps[i].id]);
+  const last = dates.length ? dates.reduce((a, b) => a > b ? a : b) : r.appliedAt;
+  const finished = idx.length === steps.length;
+  const wait = daysSince(last);
+  return {count:idx.length, total:steps.length, far:idx.length ? Math.max(...idx) : -1,
+          next:steps.findIndex(s => !r.done[s.id]), last, wait, finished,
+          stalled:!finished && wait >= STALL_DAYS};
+}
+const segs = (r, cls) => '<span class="segs ' + (cls||'') + '" aria-hidden="true">' +
+  D.steps.map(s => '<i' + (r.done[s.id] ? ' class="on"' : '') + '></i>').join('') + '</span>';
+const btn = (label, attrs, cls) => '<button class="btn ' + (cls||'') + '" ' + (attrs||'') + '><span>' + esc(label) + '</span></button>';
+const mark = () => '<div class="mark"><span class="mark-a">CCG</span><span class="mark-b">Recruit Tracker</span></div>';
+
+/* ------------------------------------------------------------------ how-to help
+   Per-state links come from the "Licensing links" sheet (STATE_LINKS).
+   The wording and the other links come from the team's "How to Get Licensed" doc.
+   Parts of that doc that name California or Los Angeles only show for CA recruits. */
+const GUIDE = {
+  nipr:'https://nipr.com/',
+  examCA:'https://test-takers.psiexams.com/cadi/available/test/RZH7TGU4',
+  psiCA:'https://www.psiexams.com/test-takers/?jsf=jet-engine:sd_test-takers&meta=industry:Insurance;the_state:California',
+  printsCA:'https://accuratebiometrics.com/california-department-of-insurance',
+  eno:'https://eno.surancebay.com/errors-and-omissions-insurance--life-and-health-agent--new.html',
+  aml:'https://aml.surancebay.com/',
+  loom:'https://www.loom.com/share/c72219624dff45a8b230e4799918a292'
+};
+const stateName = code => STATE_NAMES[code] || code;
+const questionsUrl = code => STATE_LINKS[code]
+  ? 'https://staterequirement.com/become-a-life-insurance-agent/' + STATE_NAMES[code].toLowerCase().replace(/ /g, '-') + '-life-insurance-license/'
+  : null;
+function stepHelp(sid, code){
+  const L = STATE_LINKS[code], st = stateName(code), ca = code === 'CA';
+  const h = {text:[], links:[]};
+  const link = (label, url) => { if (url) h.links.push({label, url}); };
+  const none = () => { if (!L) h.text.push('No links are listed for ' + st + ' yet. Ask your manager.'); };
+  if (sid === 'course_start'){
+    h.text.push('Do your pre-licensing course on Xcel Solutions. Pick life only, not health.');
+    h.text.push('Partner code atlasshrier (top right of their site) takes $150 off.');
+    none(); if (L) link(st + ' life course on Xcel Solutions', L.course);
+  } else if (sid === 'exam_sched'){
+    if (ca) h.text.push('The test is online and proctored, with unlimited attempts.');
+    none();
+    if (ca){ link('California life exam on PSI', GUIDE.examCA); link('PSI page for California test takers', GUIDE.psiCA); }
+    if (L) link(st + ' exam provider', L.exam);
+  } else if (sid === 'prints'){
+    if (ca) h.text.push('Los Angeles location: 6080 Center Dr, Suite #600, Los Angeles, CA 90045.');
+    none();
+    if (L && !L.prints) h.text.push('The team sheet lists no fingerprint link for ' + st + '. Ask your manager whether you need fingerprints.');
+    if (L) link(st + ' fingerprinting', L.prints);
+    if (ca) link('Los Angeles location details', GUIDE.printsCA);
+  } else if (sid === 'lic_app'){
+    h.text.push('Apply for your license on NIPR.com. You can do it the same day as your fingerprints.');
+    link('NIPR.com', GUIDE.nipr);
+    if (L) link(st + ' department of insurance', L.doi);
+  } else if (sid === 'contracts'){
+    h.text.push('First get E&O coverage (choose plan A) and do your AML training.');
+    h.text.push('Then get contracted with the carriers we partner with. There are two contract links. Ask your manager for them.');
+    h.text.push('Upload the EFT contract with your bank info so your commissions get paid.');
+    h.text.push('Once contracts are in for every carrier, training starts.');
+    link('E&O coverage (errors and omissions insurance)', GUIDE.eno);
+    link('AML training (anti-money-laundering)', GUIDE.aml);
+    link('Contracting tutorial video', GUIDE.loom);
+  } else return null;
+  return h;
+}
+const ext = l => '<a href="' + esc(l.url) + '" target="_blank" rel="noopener noreferrer">' + esc(l.label) + '</a>';
+
+/* ------------------------------------------------------------------ ui state */
+const S = {auth:'apply', tab:'recruits', q:'', step:null, sort:'wait', openId:null, confirm:null, help:{}};
+let flashTimer;
+function flash(msg){
+  const f = $('#flash'); f.textContent = msg; f.hidden = false;
+  clearTimeout(flashTimer); flashTimer = setTimeout(() => { f.hidden = true; }, 2400);
+}
+
+/* ------------------------------------------------------------------ views */
+function demoBar(){
+  const u = D.me;
+  const cur = !u ? 'apply' : u.role === 'recruit' ? 'recruit' : 'manager';
+  const b = (go, label) => '<button data-act="demo" data-go="' + go + '" aria-pressed="' + (cur === go) + '">' + label + '</button>';
+  return '<div class="demo" role="region" aria-label="Demo controls">' +
+    '<span class="demo-tag">Demo</span>' +
+    '<span class="demo-txt">Sample recruits. Nothing here is saved.</span>' +
+    '<span class="demo-btns">' + b('manager','Manager view') + b('recruit','Recruit view') + b('apply','Apply page') +
+    '<button data-act="demo-reset">Reset</button></span></div>';
+}
+
+function field(id, label, input){
+  return '<div class="f"><label for="' + id + '">' + label + '</label>' + input + '<p class="err" id="err-' + id + '" role="alert"></p></div>';
+}
+
+function authView(){
+  const apply = S.auth === 'apply';
+  const left = '<div class="auth-l">' + mark() +
+    '<h1 class="big">' + (apply ? 'Apply, then track your license' : 'Sign in') + '</h1>' +
+    '<p class="lede">' + (apply
+      ? 'Fill this in once. You get a login that shows each step of getting your insurance license, and your manager sees the same list.'
+      : 'Use the email and password you made when you applied.') + '</p>' +
+    '<ol class="preview">' + D.steps.map(s => '<li>' + esc(s.name) + '</li>').join('') + '</ol></div>';
+  const form = apply
+    ? '<form class="form" data-form="apply" novalidate>' +
+        '<h2 class="h2">Your details</h2>' +
+        field('f-name', 'Full name', '<input id="f-name" name="name" autocomplete="name" required>') +
+        '<div class="two">' +
+          field('f-phone', 'Phone', '<input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required>') +
+          field('f-state', 'State', '<select id="f-state" name="state" required><option value="">Pick one</option>' +
+            STATES.slice().sort((a, b) => stateName(a).localeCompare(stateName(b))).map(s => '<option value="' + s + '">' + esc(stateName(s)) + '</option>').join('') + '</select>') +
+        '</div>' +
+        field('f-email', 'Email', '<input id="f-email" name="email" type="email" autocomplete="email" required>') +
+        field('f-ref', 'Who referred you', '<select id="f-ref" name="referredBy" required><option value="">Pick one</option>' +
+          REFERRERS.map(n => '<option>' + esc(n) + '</option>').join('') + '</select>') +
+        field('f-password', 'Make a password', '<input id="f-password" name="password" type="password" autocomplete="new-password" required>') +
+        btn('Create my login', 'type="submit"', 'pri') +
+        '<p class="alt">Already applied? <button type="button" class="link" data-act="auth" data-mode="signin">Sign in</button></p>' +
+      '</form>'
+    : '<form class="form" data-form="signin" novalidate>' +
+        '<h2 class="h2">Sign in</h2>' +
+        field('s-email', 'Email', '<input id="s-email" name="email" type="email" autocomplete="email" required>') +
+        field('s-password', 'Password', '<input id="s-password" name="password" type="password" autocomplete="current-password" required>') +
+        btn('Sign in', 'type="submit"', 'pri') +
+        '<p class="alt">New here? <button type="button" class="link" data-act="auth" data-mode="apply">Apply</button></p>' +
+        (LIVE ? '' : '<p class="fine">Demo logins: dana@example.com or owner@example.com, password demo1234.</p>') +
+      '</form>';
+  return '<div class="wrap auth">' + left + '<div class="auth-r">' + form + '</div></div>';
+}
+
+function topBar(u, tabs){
+  const t = (id, label) => '<button data-act="tab" data-tab="' + id + '"' + (S.tab === id ? ' aria-current="page"' : '') + '>' + label + '</button>';
+  return '<header class="top">' + mark() +
+    (tabs ? '<nav class="tabs" aria-label="Sections">' + t('recruits','Recruits') + t('steps','Steps') + t('team','Team') + '</nav>' : '<span class="tabs"></span>') +
+    '<div class="who"><span>' + esc(u.name) + '</span><button class="link" data-act="signout">Sign out</button></div></header>';
+}
+
+function checklist(r, who){
+  const p = prog(r);
+  return '<div class="checklist">' + D.steps.map((s, i) => {
+    const on = !!r.done[s.id], isNext = i === p.next;
+    const id = 'st-' + r.id + '-' + s.id;
+    const h = who === 'me' ? stepHelp(s.id, r.state) : null;
+    const open = s.id in S.help ? S.help[s.id] : (isNext && !on);
+    const how = h ? '<details class="how" data-how="' + s.id + '"' + (open ? ' open' : '') + '>' +
+      '<summary id="how-' + s.id + '" data-act="how">How to do this</summary><div class="how-b">' +
+      h.text.map(t => '<p>' + esc(t) + '</p>').join('') +
+      (h.links.length ? '<div class="links">' + h.links.map(ext).join('') + '</div>' : '') + '</div></details>' : '';
+    return '<label class="chk' + (isNext ? ' next' : '') + (s.auto ? ' locked' : '') + (h ? ' has-how' : '') + '" for="' + id + '">' +
+      '<span class="chk-b"><input type="checkbox" id="' + id + '" data-change="step" data-rid="' + r.id + '" data-sid="' + s.id + '"' +
+        (on ? ' checked' : '') + (s.auto ? ' disabled' : '') + '><span class="box"></span></span>' +
+      '<span class="chk-nm">' + esc(s.name) + '</span>' +
+      '<span class="chk-dt">' + (on ? fmt(r.done[s.id]) : isNext ? (who === 'me' ? 'Next up' : 'Next') : '') + '</span></label>' + how;
+  }).join('') + '</div>';
+}
+
+function recruitView(u){
+  const r = D.mine;
+  if (!r) return '<div class="wrap">' + topBar(u) + '<p class="lede">Your login has no recruit record. Ask your manager.</p></div>';
+  const p = prog(r), steps = D.steps;
+  const head = p.finished ? 'All ' + p.total + ' steps done' : 'Next: ' + steps[p.next].name;
+  const L = STATE_LINKS[r.state], st = stateName(r.state);
+  const more = L ? '<div class="sec"><h2 class="h2">More for ' + esc(st) + '</h2><div class="links" id="more-links">' +
+    ext({label:st + ' department of insurance', url:L.doi}) +
+    ext({label:'Questions on the process: ' + st + ' licensing guide', url:questionsUrl(r.state)}) + '</div></div>' : '';
+  return '<div class="wrap">' + topBar(u) +
+    '<section class="me">' +
+      '<p class="eyebrow">' + esc(r.name) + ' &middot; ' + esc(st) + '</p>' +
+      '<h1 class="big">' + esc(head) + '</h1>' +
+      segs(r, 'lg' + (p.finished ? ' fin' : '')) +
+      '<p class="lede">' + p.count + ' of ' + p.total + ' steps done. Last update ' + dayWord(p.wait) + '.</p>' +
+      checklist(r, 'me') + more +
+      '<p class="fine">Tick a step when you finish it. Your managers see this list. Steps can differ by state, so ask your manager if one does not apply to you.</p>' +
+    '</section></div>';
+}
+
+function recruitsTab(){
+  const steps = D.steps;
+  const all = D.recruits.map(r => ({r, p:prog(r)}));
+  const counts = steps.map((s, i) => all.filter(x => x.p.far === i).length);
+  const stalled = all.filter(x => x.p.stalled).length, fin = all.filter(x => x.p.finished).length;
+  let list = all;
+  if (S.step){ const i = steps.findIndex(s => s.id === S.step); list = list.filter(x => x.p.far === i); }
+  const q = S.q.trim().toLowerCase();
+  if (q) list = list.filter(x => (x.r.name + ' ' + x.r.state + ' ' + stateName(x.r.state) + ' ' + x.r.referredBy + ' ' + x.r.email).toLowerCase().includes(q));
+  const sorters = {
+    wait:(a, b) => (a.p.finished - b.p.finished) || (b.p.wait - a.p.wait) || a.r.name.localeCompare(b.r.name),
+    new:(a, b) => b.r.appliedAt.localeCompare(a.r.appliedAt),
+    name:(a, b) => a.r.name.localeCompare(b.r.name)
+  };
+  list = list.slice().sort(sorters[S.sort] || sorters.wait);
+
+  const track = '<div class="track" role="group" aria-label="How many recruits are on each step">' +
+    steps.map((s, i) => '<button class="stop' + (counts[i] ? '' : ' zero') + '" data-act="filter" data-step="' + s.id + '" aria-pressed="' + (S.step === s.id) + '">' +
+      '<span class="stop-n">' + counts[i] + '</span><span class="stop-nm">' + esc(s.name) + '</span></button>').join('') + '</div>';
+
+  const rows = list.map(({r, p}) => {
+    const cur = p.far >= 0 ? steps[p.far].name : 'Not started';
+    const wait = p.finished
+      ? '<span class="r-wait done"><b>Done</b>' + fmt(p.last) + '</span>'
+      : '<span class="r-wait' + (p.stalled ? ' stalled' : '') + '"><b>' + p.wait + '</b>' + (p.stalled ? '<span class="tag">days, stalled</span>' : (p.wait === 1 ? 'day' : 'days')) + '</span>';
+    return '<li><button class="row" id="row-' + r.id + '" data-act="open" data-id="' + r.id + '">' +
+      '<span class="r-who"><span class="r-name">' + esc(r.name) + '</span><span class="r-sub">' + esc(r.state) +
+        (r.referredBy ? ' &middot; referred by ' + esc(r.referredBy) : '') + '</span></span>' +
+      '<span class="r-prog">' + segs(r, p.finished ? 'fin' : '') + '<span class="r-step">' + esc(cur) +
+        '<span class="r-count">' + p.count + ' of ' + p.total + '</span></span></span>' + wait + '</button></li>';
+  }).join('');
+
+  const filtered = S.step || q;
+  return '<section class="sec"><h1 class="big">' + all.length + ' recruit' + (all.length === 1 ? '' : 's') + '</h1>' +
+      '<p class="lede">' + stalled + ' with no progress in ' + STALL_DAYS + '+ days. ' + fin + ' finished. The number on each step is how many recruits have reached it and gone no further.</p></section>' +
+    track +
+    '<div class="tools">' +
+      '<div class="f"><label for="q">Search</label><input id="q" type="search" data-input="q" value="' + esc(S.q) + '" autocomplete="off"></div>' +
+      '<div class="f narrow"><label for="sort">Order</label><select id="sort" data-change="sort">' +
+        [['wait','Longest since last step'],['new','Newest applicants'],['name','Name A to Z']].map(o =>
+          '<option value="' + o[0] + '"' + (S.sort === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></div>' +
+    '</div>' +
+    '<div><div class="cols tag" aria-hidden="true"><span>Recruit</span><span>Latest step finished</span><span>Since last step</span></div>' +
+    (list.length ? '<ul id="list">' + rows + '</ul>'
+      : '<div class="empty" id="list"><span>No recruits match.</span>' + (filtered ? '<button class="link" data-act="clear">Show everyone</button>' : '') + '</div>') +
+    '</div>' +
+    (LIVE
+      ? '<div class="sec"><div class="sec-h"><h2 class="h2">Apply link</h2><small>Send this to new recruits. It is how they get a login.</small></div>' +
+        '<dl class="contact"><div><dt>Link</dt><dd id="apply-link">' + esc(location.origin + location.pathname + '#apply') + '</dd>' +
+        '<button class="link" data-act="copy" data-target="apply-link">Copy</button></div></dl></div>'
+      : '<p class="fine">New recruits add themselves on the apply page. Use the Apply page button in the demo strip to see it.</p>');
+}
+
+function panel(u){
+  const r = D.recruits.find(x => x.id === S.openId);
+  if (!r){ S.openId = null; return ''; }
+  const p = prog(r), steps = D.steps;
+  const status = p.finished ? 'All ' + p.total + ' steps done' : (p.far >= 0 ? steps[p.far].name : 'Not started') + ', ' + p.count + ' of ' + p.total;
+  const c = (label, id, val) => '<div><dt>' + label + '</dt><dd id="' + id + '">' + esc(val) + '</dd><button class="link" data-act="copy" data-target="' + id + '">Copy</button></div>';
+  const confirm = S.confirm === 'remove'
+    ? '<div class="confirm"><p>Remove ' + esc(r.name) + ' and their login? This cannot be undone.</p>' +
+        btn('Remove', 'data-act="remove-yes" id="rm-yes"', 'danger sm') + '<button class="link" data-act="confirm-no">Keep</button></div>'
+    : S.confirm === 'promote'
+    ? '<div class="confirm"><p>Give ' + esc(r.name) + ' manager access? They will see every recruit.</p>' +
+        btn('Make manager', 'data-act="promote-yes" id="pm-yes"', 'pri sm') + '<button class="link" data-act="confirm-no">Cancel</button></div>'
+    : '<div class="acts">' + (u.role === 'owner' ? '<button class="link" data-act="promote" id="pm-ask">Make manager</button>' : '') +
+        '<button class="link bad" data-act="remove" id="rm-ask">Remove recruit</button></div>';
+  return '<div class="scrim" data-act="close"></div>' +
+    '<aside class="panel' + (S.fresh ? ' enter' : '') + '" id="panel" role="dialog" aria-modal="true" aria-labelledby="p-name">' +
+      '<div class="panel-top"><button class="link" data-act="close" id="p-close">Close</button></div>' +
+      '<div class="sec"><h2 class="big" id="p-name" style="font-size:38px">' + esc(r.name) + '</h2>' +
+        '<p class="p-meta">' + esc(r.state) + ' &middot; applied ' + fmt(r.appliedAt) + (r.referredBy ? ' &middot; referred by ' + esc(r.referredBy) : '') + '</p>' +
+        segs(r, 'lg' + (p.finished ? ' fin' : '')) + '<p class="p-meta">' + esc(status) + '. Last update ' + dayWord(p.wait) + '.</p></div>' +
+      '<dl class="contact">' + c('Phone', 'c-phone', r.phone) + c('Email', 'c-email', r.email) + '</dl>' +
+      (function(){
+        const L = STATE_LINKS[r.state], st = stateName(r.state);
+        return '<div class="sec"><div class="sec-h"><h3 class="h2">Links for ' + esc(st) + '</h3><small>The same ones this recruit sees</small></div>' +
+          (L ? '<div class="links" id="p-links">' + ext({label:'Pre-licensing course', url:L.course}) + ext({label:'Exam provider', url:L.exam}) +
+              (L.prints ? ext({label:'Fingerprinting', url:L.prints}) : '<span class="nolink">Fingerprinting: none listed in the team sheet</span>') +
+              ext({label:'Department of insurance', url:L.doi}) + '</div>'
+            : '<p class="p-meta">No links are listed for ' + esc(st) + ' yet.</p>') + '</div>';
+      })() +
+      '<div class="sec"><div class="sec-h"><h3 class="h2">Licensing steps</h3><small>Tick or untick to correct</small></div>' + checklist(r, 'mgr') + '</div>' +
+      '<div class="sec"><div class="sec-h"><h3 class="h2">Notes</h3><small>Managers only. The recruit never sees these.</small></div>' +
+        '<form class="form" data-form="note"><div class="f"><label for="note-text">Add a note</label><textarea id="note-text" data-keep></textarea><p class="err" id="err-note-text" role="alert"></p></div>' +
+          '<div>' + btn('Save note', 'type="submit" id="note-save"', 'sm') + '</div></form>' +
+        (r.notes.length ? '<ul class="notes">' + r.notes.map(n => '<li><p>' + esc(n.text) + '</p><p class="n-by">' + esc(n.by) + ', ' + fmt(n.at) + '</p></li>').join('') + '</ul>' : '') +
+      '</div>' + confirm +
+    '</aside>';
+}
+
+function stepsTab(){
+  const steps = D.steps, all = D.recruits;
+  return '<section class="sec"><h1 class="big">Licensing steps</h1>' +
+    '<p class="lede">Every recruit tracks this same list. A change here shows up for everyone right away.</p></section>' +
+    '<ol class="sedit">' + steps.map((s, i) => {
+      const used = all.filter(r => r.done[s.id]).length;
+      const ask = S.confirm === 'step:' + s.id;
+      return '<li><span class="sn">' + (i+1) + '</span>' +
+        '<input class="inp" id="sname-' + s.id + '" aria-label="Name of step ' + (i+1) + '" data-change="rename" data-id="' + s.id + '" value="' + esc(s.name) + '">' +
+        (s.auto ? '<span class="sacts"></span><span class="note">Ticked automatically when someone applies. It stays first.</span>'
+          : '<span class="sacts">' +
+              '<button class="link" id="up-' + s.id + '" data-act="mv" data-id="' + s.id + '" data-dir="-1"' + (i <= 1 ? ' disabled' : '') + ' aria-label="Move ' + esc(s.name) + ' up">Up</button>' +
+              '<button class="link" id="dn-' + s.id + '" data-act="mv" data-id="' + s.id + '" data-dir="1"' + (i === steps.length-1 ? ' disabled' : '') + ' aria-label="Move ' + esc(s.name) + ' down">Down</button>' +
+              '<button class="link bad" id="rm-' + s.id + '" data-act="rm-step" data-id="' + s.id + '" aria-label="Remove ' + esc(s.name) + '">Remove</button></span>') +
+        (ask ? '<div class="confirm"><p>' + (used ? used + ' recruit' + (used === 1 ? ' has' : 's have') + ' this step ticked. Removing it erases those ticks.' : 'Remove this step?') + '</p>' +
+            btn('Remove step', 'data-act="rm-step-yes" data-id="' + s.id + '"', 'danger sm') + '<button class="link" data-act="confirm-no">Keep</button></div>' : '') +
+      '</li>';
+    }).join('') + '</ol>' +
+    '<form class="addstep" data-form="addstep" novalidate><div class="f"><label for="new-step">Add a step</label><input id="new-step" autocomplete="off"><p class="err" id="err-new-step" role="alert"></p></div>' +
+      btn('Add step', 'type="submit"', '') + '</form>';
+}
+
+function teamTab(u){
+  const mgrs = D.managers;
+  return '<section class="sec"><h1 class="big">Managers</h1>' +
+    '<p class="lede">Managers see every recruit and can correct steps, add notes, and edit the step list. Only the owner can add or remove a manager.</p></section>' +
+    '<ul class="team">' + mgrs.map(m => '<li><span class="t-who">' + esc(m.name) + (m.id === u.id ? ' (you)' : '') + '<span>' + esc(m.email) + '</span></span>' +
+      '<span class="tag role">' + (m.role === 'owner' ? 'Owner' : 'Manager') + '</span>' +
+      (u.role === 'owner' && m.role === 'manager' ? '<button class="link bad" data-act="demote" data-id="' + m.id + '">Remove manager access</button>' : '<span></span>') + '</li>').join('') + '</ul>' +
+    '<p class="fine">To add a manager: they sign up on the apply page, you open their name under Recruits, then choose Make manager. Removing access puts them back in the recruit list.</p>';
+}
+
+function managerView(u){
+  const body = S.tab === 'steps' ? stepsTab() : S.tab === 'team' ? teamTab(u) : recruitsTab();
+  return '<div class="wrap">' + topBar(u, true) + body + '</div>' + (S.openId ? panel(u) : '');
+}
+
+/* ------------------------------------------------------------------ render */
+function waitView(){
+  return '<div class="wrap">' + mark() + '<p class="lede">' + (D.error
+    ? 'Could not reach the tracker. Check your connection, then reload this page.' : 'Loading') + '</p></div>';
+}
+function render(focusId){
+  const a = document.activeElement;
+  const keep = {id:focusId || (a && a.id) || null, vals:{}, scroll:$('#panel') ? $('#panel').scrollTop : 0};
+  try { if (a && a.id && !focusId && typeof a.selectionStart === 'number') keep.sel = [a.selectionStart, a.selectionEnd]; } catch (e) {}
+  document.querySelectorAll('[data-keep]').forEach(el => { keep.vals[el.id] = el.value; });
+  $('#demo').innerHTML = LIVE ? '' : demoBar();
+  const u = D.me;
+  $('#app').innerHTML = (!D.ready || D.error) ? waitView() : !u ? authView() : u.role === 'recruit' ? recruitView(u) : managerView(u);
+  Object.keys(keep.vals).forEach(id => { const el = document.getElementById(id); if (el) el.value = keep.vals[id]; });
+  if ($('#panel')) $('#panel').scrollTop = keep.scroll;
+  if (keep.id){
+    const el = document.getElementById(keep.id);
+    if (el){ el.focus({preventScroll:true}); if (keep.sel){ try { el.setSelectionRange(keep.sel[0], keep.sel[1]); } catch (e) {} } }
+  }
+}
+function setErr(id, msg){
+  const p = document.getElementById('err-' + id), el = document.getElementById(id);
+  if (p) p.textContent = msg || '';
+  if (el){ if (msg) el.setAttribute('aria-invalid','true'); else el.removeAttribute('aria-invalid'); }
+}
+function closePanel(){ const id = S.openId; S.openId = null; S.confirm = null; render(id ? 'row-' + id : null); }
+const openRecruit = () => D.recruits.find(x => x.id === S.openId);
+
+/* One action at a time. If one fails, say why and show what is really saved. */
+let busy = false;
+async function run(fn, arg){
+  if (busy) return;
+  busy = true;
+  try { await fn(arg); }
+  catch (err) { flash((err && err.message) || 'Something went wrong.'); try { await sync(); } catch (e) {} render(); }
+  finally { busy = false; }
+}
+
+/* ------------------------------------------------------------------ actions */
+const act = {
+  async demo(t){
+    S.openId = null; S.confirm = null; S.help = {};
+    await B.signOut();
+    if (t.dataset.go === 'recruit') await B.signIn('dana@example.com','demo1234');
+    else if (t.dataset.go === 'manager') await B.signIn('owner@example.com','demo1234');
+    else S.auth = 'apply';
+    S.tab = 'recruits'; await sync(); render(); window.scrollTo(0, 0);
+  },
+  async 'demo-reset'(){ seed(); Object.assign(S, {auth:'apply', tab:'recruits', q:'', step:null, sort:'wait', openId:null, confirm:null, help:{}}); await B.signIn('owner@example.com','demo1234'); await sync(); render(); flash('Sample data reset'); },
+  auth(t){ S.auth = t.dataset.mode; render(); },
+  async signout(){ await B.signOut(); Object.assign(S, {auth:'signin', tab:'recruits', q:'', step:null, openId:null, confirm:null, help:{}}); await sync(); render(); },
+  tab(t){ S.tab = t.dataset.tab; S.confirm = null; render(); },
+  filter(t){ S.step = S.step === t.dataset.step ? null : t.dataset.step; render(); },
+  clear(){ S.step = null; S.q = ''; render('q'); },
+  open(t){ S.openId = t.dataset.id; S.confirm = null; S.fresh = true; render('p-close'); S.fresh = false; },
+  close(){ closePanel(); },
+  how(t){ const d = t.parentElement; S.help[d.dataset.how] = !d.open; },
+  copy(t){
+    const el = document.getElementById(t.dataset.target), text = el.textContent;
+    const pick = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); flash('Selected. Copy it from here.'); };
+    try { navigator.clipboard.writeText(text).then(() => flash('Copied'), pick); } catch (e) { pick(); }
+  },
+  remove(){ S.confirm = 'remove'; render('rm-yes'); },
+  promote(){ S.confirm = 'promote'; render('pm-yes'); },
+  'confirm-no'(){ S.confirm = null; render(); },
+  async 'remove-yes'(){ const r = openRecruit(); await B.removeRecruit(r.id); S.openId = null; S.confirm = null; await sync(); render('q'); flash(r.name + ' removed'); },
+  async 'promote-yes'(){ const r = openRecruit(); await B.setRole(r.userId, 'manager'); S.openId = null; S.confirm = null; await sync(); render('q'); flash(r.name + ' is now a manager'); },
+  async demote(t){ await B.setRole(t.dataset.id, 'recruit'); await sync(); render(); flash('Manager access removed'); },
+  async mv(t){
+    const dir = Number(t.dataset.dir);
+    await B.moveStep(t.dataset.id, dir); await sync(); render((dir < 0 ? 'up-' : 'dn-') + t.dataset.id);
+    if (document.activeElement && document.activeElement.disabled) document.getElementById('sname-' + t.dataset.id).focus();
+  },
+  'rm-step'(t){ S.confirm = 'step:' + t.dataset.id; render(); },
+  async 'rm-step-yes'(t){ await B.removeStep(t.dataset.id); S.confirm = null; if (S.step === t.dataset.id) S.step = null; await sync(); render('new-step'); flash('Step removed'); }
+};
+const forms = {
+  async apply(f){
+    const ids = {name:'f-name', phone:'f-phone', state:'f-state', email:'f-email', referredBy:'f-ref', password:'f-password'};
+    Object.values(ids).forEach(id => setErr(id, ''));
+    const v = n => f.elements[n].value;
+    try {
+      const u = await B.apply({name:v('name'), phone:v('phone'), email:v('email'), state:v('state'), referredBy:v('referredBy'), password:v('password')});
+      await sync(); render(); window.scrollTo(0, 0); flash('Login created. Welcome, ' + u.name.split(' ')[0] + '.');
+    } catch (e) {
+      if (!e.fields){ setErr('f-password', e.message); return; }      // keep what they typed
+      let first;
+      Object.keys(ids).forEach(k => { if (e.fields[k]){ setErr(ids[k], e.fields[k]); first = first || ids[k]; } });
+      if (first) document.getElementById(first).focus();
+    }
+  },
+  async signin(f){
+    setErr('s-password', '');
+    try { await B.signIn(f.elements.email.value, f.elements.password.value); S.tab = 'recruits'; await sync(); render(); window.scrollTo(0, 0); }
+    catch (e) { setErr('s-password', e.message); }
+  },
+  async note(){
+    const ta = document.getElementById('note-text');
+    try { await B.addNote(S.openId, ta.value); ta.value = ''; await sync(); render('note-text'); flash('Note saved'); }
+    catch (e) { setErr('note-text', e.message); ta.focus(); }
+  },
+  async addstep(){
+    const inp = document.getElementById('new-step');
+    try { await B.addStep(inp.value); await sync(); render('new-step'); document.getElementById('new-step').value = ''; flash('Step added'); }
+    catch (e) { setErr('new-step', e.message); inp.focus(); }
+  }
+};
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if (!t || t.disabled) return;
+  const fn = act[t.dataset.act];
+  if (fn) run(fn, t);
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target, fn = forms[f.dataset.form];
+  if (!fn || busy) return;
+  const b = f.querySelector('[type="submit"]');
+  if (b) b.disabled = true;
+  run(fn, f).then(() => { if (b && b.isConnected) b.disabled = false; });
+});
+document.addEventListener('input', e => {
+  if (e.target.dataset.input === 'q'){ S.q = e.target.value; render(); }
+});
+document.addEventListener('change', e => {
+  const t = e.target, kind = t.dataset.change;
+  if (kind === 'sort'){ S.sort = t.value; render(); return; }
+  if (kind !== 'step' && kind !== 'rename') return;
+  if (busy){ if (kind === 'step') t.checked = !t.checked; return; }     // nothing was saved, so do not show it as saved
+  if (kind === 'step') run(async () => { const on = t.checked; await B.setStep(t.dataset.rid, t.dataset.sid, on); await sync(); render(); flash(on ? 'Step ticked' : 'Step unticked'); });
+  else run(async () => { await B.renameStep(t.dataset.id, t.value); await sync(); flash('Step renamed'); });
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.openId) closePanel(); });
+document.addEventListener('visibilitychange', () => {                   // coming back to the tab shows what others changed
+  if (LIVE && D.ready && D.me && document.visibilityState === 'visible') run(async () => { await sync(); render(); });
+});
+
+/* ------------------------------------------------------------------ start */
+const start = (location.hash || '').replace('#', '');
+if (LIVE) S.auth = start === 'apply' ? 'apply' : 'signin';
+else {
+  seed();
+  if (start === 'apply') S.auth = 'apply';
+  else if (start === 'recruit') api.signIn('dana@example.com','demo1234');
+  else api.signIn('owner@example.com','demo1234');
+}
+render();
+sync().then(() => render(), err => { D.error = (err && err.message) || 'error'; render(); });
+window.__recruitTracker = LIVE ? {live:true} : {api, state:S, stepHelp, questionsUrl, STATE_LINKS, STATE_NAMES};
+})();
+</script>
+
+</body>
+</html>
